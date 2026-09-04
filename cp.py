@@ -60,6 +60,6 @@ def registrar_incidente(**kwargs):
         "indisponivel": kwargs.get("indisponivel", False),
     }
 
-registro = registrar_incidente(servico="login", criticidade=3, descricao="Falha de autenticação", data="2024-06-01", usuario="usuario123")
-print(registro)
+# registro = registrar_incidente(servico="login", criticidade=3, descricao="Falha de autenticação", data="2024-06-01", usuario="usuario123")
+# print(registro)
 
