@@ -1,3 +1,9 @@
+# Nome: Antonio do Nascimento Ferreira RM: 573706
+# Nome: Guilherme Pereira Ruiz da Silva RM: 573360
+# Nome: Gustavo Leal RM: 569361
+# Nome: Matheus Mendes RM: 569559
+# Nome: Matheus Sato RM: 569392
+
 servicos = {
     "login": {
         "criticidade": 3,
@@ -159,3 +165,17 @@ print(f"\n--- Serviço inexistente ---\n{erro_servico}")
 
 _, erro_usuarios = processar_incidente(servicos, "login", usuarios_afetados=-5, indisponivel=False)
 print(f"\n--- Usuários inválidos ---\n{erro_usuarios}")
+
+
+
+# --- Caso A ---
+# {'servico': 'login', 'descricao': 'acesso ao sistema', 'sintomas': ['senha rejeitada', 'tela retorna ao início'], 'registro': {'servico': 'login', 'usuarios_afetados': 20, 'indisponivel': False}, 'pontuacao': 3, 'prioridade': 'PRIORIDADE NORMAL', 'mensagem': "Serviço 'login' pode ser tratado dentro do fluxo normal."}
+
+# --- Caso B ---
+# {'servico': 'pagamento', 'descricao': 'processamento de pagamentos', 'sintomas': ['checkout falha', 'PIX indisponível', 'cartão recusado'], 'registro': {'servico': 'pagamento', 'usuarios_afetados': 250, 'indisponivel': True}, 'pontuacao': 10, 'prioridade': 'PRIORIDADE ALTA', 'mensagem': "Atenção imediata para o serviço 'pagamento'."}
+
+# --- Serviço inexistente ---
+# Serviço não encontrado
+
+# --- Usuários inválidos ---
+# Quantidade de usuários inválida
