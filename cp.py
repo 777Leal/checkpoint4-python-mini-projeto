@@ -74,15 +74,14 @@ def registrar_incidente(**kwargs):
 # Exercicio 4 --------------------------
 
 def calcular_pontuacao(criticidade, usuarios_afetados=0, indisponivel=False):
+    if usuarios_afetados < 0:
+        return None, "Quantidade de usuários inválida"
     pontuacao = criticidade
     if usuarios_afetados >= 100:
         pontuacao += 3
     if indisponivel:
         pontuacao += 2
-    return pontuacao
-
-pontuacao_incidente = calcular_pontuacao(criticidade=5, usuarios_afetados=250, indisponivel=True)
-print(pontuacao_incidente)
+    return pontuacao, None
 
 # Exercicio 5 --------------------------
 
@@ -103,9 +102,8 @@ def gerar_mensagem_tecnica(pontuacao, servico):
 
 def processar_incidente(catalogo, servico, *sintomas, mensagem_erro="Serviço não encontrado", **dados_incidente):
     dados_servico = consultar_servico(catalogo, servico, mensagem_erro)
-
-    if dados_servico == mensagem_erro:
-        return None, mensagem_erro
+    if isinstance(dados_servico, str):
+        return None, dados_servico
 
     lista_sintomas = registrar_sintomas(*sintomas)
 
@@ -115,14 +113,15 @@ def processar_incidente(catalogo, servico, *sintomas, mensagem_erro="Serviço n�
         indisponivel=dados_incidente.get("indisponivel", False),
     )
 
-    pontuacao = calcular_pontuacao(
+    pontuacao, erro_pontuacao = calcular_pontuacao(
         criticidade=dados_servico["criticidade"],
         usuarios_afetados=registro["usuarios_afetados"],
         indisponivel=registro["indisponivel"],
     )
+    if erro_pontuacao:
+        return None, erro_pontuacao
 
-    prioridade = classificar_prioridade(pontuacao)  # depende do exercício 7
-
+    prioridade = classificar_prioridade(pontuacao)
     pontuacao, mensagem = gerar_mensagem_tecnica(pontuacao, servico)
 
     resumo = {
@@ -140,9 +139,23 @@ def processar_incidente(catalogo, servico, *sintomas, mensagem_erro="Serviço n�
 # TODO: criar uma lambda simples que recebe a pontuação e devolve
 # "PRIORIDADE ALTA" (>= 7) ou "PRIORIDADE NORMAL" (< 7)
 # classificar_prioridade = lambda pontuacao: .....
+classificar_prioridade = lambda pontuacao: "PRIORIDADE ALTA" if pontuacao >= 7 else "PRIORIDADE NORMAL"
 
-# Chamada de exemplo já usando a função lambda do exercicio 7
-resumo, erro = processar_incidente(
-    servicos, "pagamento", "checkout falha", "PIX indisponível", "cartão recusado",
-    usuarios_afetados=250, indisponivel=True
-)
+# Casos testes- passei a contextualização do exercicio e o nosso código final, com isso o CLaude gerou um fluxo de testes.
+casos_teste = [
+    ("Caso A", "login", ["senha rejeitada", "tela retorna ao início"],
+     {"usuarios_afetados": 20, "indisponivel": False}),
+    ("Caso B", "pagamento", ["checkout falha", "PIX indisponível", "cartão recusado"],
+     {"usuarios_afetados": 250, "indisponivel": True}),
+]
+
+for label, servico, sintomas, dados in casos_teste:
+    resumo, erro = processar_incidente(servicos, servico, *sintomas, **dados)
+    print(f"\n--- {label} ---")
+    print(resumo if not erro else erro)
+
+_, erro_servico = processar_incidente(servicos, "chat", usuarios_afetados=10, indisponivel=False)
+print(f"\n--- Serviço inexistente ---\n{erro_servico}")
+
+_, erro_usuarios = processar_incidente(servicos, "login", usuarios_afetados=-5, indisponivel=False)
+print(f"\n--- Usuários inválidos ---\n{erro_usuarios}")
